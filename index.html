@@ -179,7 +179,7 @@
             timeout = setTimeout(later, wait);
         };
     }
-    
+
     const qrText = document.getElementById('qr-text');
     const qrSize = document.getElementById('qr-size');
     const qrSizeValue = document.getElementById('qr-size-value');
@@ -199,6 +199,7 @@
 
     let qrCode = null;
 
+    // Using requestAnimationFrame to optimize rendering
     function updateQRCode() {
         if (!qrText.value.trim()) {
             qrCanvas.innerHTML = '';
@@ -223,7 +224,6 @@
         canvas.height = size;
         const ctx = canvas.getContext('2d');
 
-
         ctx.fillStyle = bgColor.value;
         ctx.fillRect(0, 0, size, size);
 
@@ -239,18 +239,24 @@
 
         ctx.fillStyle = fillStyle;
 
-
-        for (let row = 0; row < count; row++) {
-            for (let col = 0; col < count; col++) {
-                if (qrData[row][col]) {
-                    ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        // Rendering QR code in smaller steps for smoothness
+        let row = 0;
+        function drawRow() {
+            if (row < count) {
+                for (let col = 0; col < count; col++) {
+                    if (qrData[row][col]) {
+                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    }
                 }
+                row++;
+                requestAnimationFrame(drawRow); // Continue drawing in the next frame
+            } else {
+                downloadBtn.disabled = false;
             }
         }
 
-        downloadBtn.disabled = false;
+        drawRow(); // Start drawing rows step by step
     }
-
 
     function downloadQRCode() {
         const imageUrl = qrCanvas.toDataURL('image/png');
@@ -260,8 +266,7 @@
         link.click();
     }
 
-
-    qrText.addEventListener('input', debounce(updateQRCode, 300));
+    qrText.addEventListener('input', debounce(updateQRCode, 500));  // Increase debounce delay
     qrSize.addEventListener('input', () => {
         qrSizeValue.textContent = `${qrSize.value}px`;
         updateQRCode();
