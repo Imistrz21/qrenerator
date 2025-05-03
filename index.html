@@ -206,34 +206,53 @@
             return;
         }
 
-        qrCanvas.innerHTML = '';
         const size = parseInt(qrSize.value);
-
-        qrCode = new QRCode(qrCanvas, {
+        const qr = new QRCode(document.createElement('div'), {
             text: qrText.value,
             width: size,
             height: size,
-            colorDark: useGradient.checked
-                ? '#ffffff'
-                : fgColor.value,
-            colorLight: bgColor.value,
+            colorDark: '#000000',
+            colorLight: '#ffffff'
         });
 
+        const qrData = qr._oQRCode.modules;
+        const count = qrData.length;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        // Background
+        ctx.fillStyle = bgColor.value;
+        ctx.fillRect(0, 0, size, size);
+
+        const cellSize = size / count;
+
+        let fillStyle = fgColor.value;
+
         if (useGradient.checked) {
-            const ctx = qrCanvas.querySelector('canvas').getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, size, size);
             gradient.addColorStop(0, gradientColor1.value);
             gradient.addColorStop(1, gradientColor2.value);
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, size, size);
-            ctx.globalCompositeOperation = 'destination-in';
-            ctx.drawImage(qrCanvas.querySelector('canvas'), 0, 0);
-            ctx.globalCompositeOperation = 'source-over';
+            fillStyle = gradient;
         }
 
+        ctx.fillStyle = fillStyle;
+
+        for (let row = 0; row < count; row++) {
+            for (let col = 0; col < count; col++) {
+                if (qrData[row][col]) {
+                    ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+
+        qrCanvas.innerHTML = '';
+        qrCanvas.appendChild(canvas);
         downloadBtn.disabled = false;
     }
+
 
     function updateContainerStyles() {
         qrContainer.style.borderRadius = `${borderRadius.value}px`;
