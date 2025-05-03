@@ -179,7 +179,7 @@
             timeout = setTimeout(later, wait);
         };
     }
-
+    
     const qrText = document.getElementById('qr-text');
     const qrSize = document.getElementById('qr-size');
     const qrSizeValue = document.getElementById('qr-size-value');
@@ -218,19 +218,18 @@
         const qrData = qr._oQRCode.modules;
         const count = qrData.length;
 
-        const canvas = document.createElement('canvas');
+        const canvas = qrCanvas;
         canvas.width = size;
         canvas.height = size;
         const ctx = canvas.getContext('2d');
 
-        // Background
+
         ctx.fillStyle = bgColor.value;
         ctx.fillRect(0, 0, size, size);
 
         const cellSize = size / count;
 
         let fillStyle = fgColor.value;
-
         if (useGradient.checked) {
             const gradient = ctx.createLinearGradient(0, 0, size, size);
             gradient.addColorStop(0, gradientColor1.value);
@@ -240,6 +239,7 @@
 
         ctx.fillStyle = fillStyle;
 
+
         for (let row = 0; row < count; row++) {
             for (let col = 0; col < count; col++) {
                 if (qrData[row][col]) {
@@ -248,28 +248,18 @@
             }
         }
 
-        qrCanvas.innerHTML = '';
-        qrCanvas.appendChild(canvas);
         downloadBtn.disabled = false;
     }
 
 
-    function updateContainerStyles() {
-        qrContainer.style.borderRadius = `${borderRadius.value}px`;
-        qrContainer.style.padding = `${padding.value}px`;
-        borderRadiusValue.textContent = `${borderRadius.value}px`;
-        paddingValue.textContent = `${padding.value}px`;
-    }
-
     function downloadQRCode() {
-        const canvas = qrCanvas.querySelector('canvas');
-        if (!canvas) return;
-
+        const imageUrl = qrCanvas.toDataURL('image/png');
         const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'qrcode.png';
+        link.href = imageUrl;
+        link.download = 'qr-code.png';
         link.click();
     }
+
 
     qrText.addEventListener('input', debounce(updateQRCode, 300));
     qrSize.addEventListener('input', () => {
@@ -284,11 +274,11 @@
     gradientColor1.addEventListener('input', updateQRCode);
     gradientColor2.addEventListener('input', updateQRCode);
     bgColor.addEventListener('input', updateQRCode);
-    borderRadius.addEventListener('input', updateContainerStyles);
-    padding.addEventListener('input', updateContainerStyles);
+    borderRadius.addEventListener('input', updateQRCode);
+    padding.addEventListener('input', updateQRCode);
     downloadBtn.addEventListener('click', downloadQRCode);
 
-    updateContainerStyles();
+    updateQRCode();
 </script>
 </body>
 </html>
