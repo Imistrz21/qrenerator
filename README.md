@@ -29,4 +29,4 @@ You can try out the live version of QRenerator here:
 
 ## Screenshots
 
-![QRenerator Screenshot](./screenshot.png)
+![QRenerator Screenshot](./image.png)
