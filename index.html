@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRenerator - Custom QR Code Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #1a202c, #2d3748);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #e2e8f0;
+        }
+        .glass {
+            background: rgba(26, 32, 44, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .led-glow {
+            box-shadow: 0 0 10px theme('colors.cyan.500'), 0 0 20px theme('colors.magenta.500');
+        }
+        input[type="color"] {
+            -webkit-appearance: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between">
+<header class="w-full max-w-4xl mx-auto py-6 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold text-cyan-400 led-glow">QRenerator</h1>
+    <p class="mt-2 text-lg text-gray-300">Create custom QR codes with style!</p>
+</header>
+
+<main class="w-full max-w-4xl mx-auto flex flex-col md:flex-row gap-6 px-4">
+    <section class="flex-1 glass p-6 rounded-xl">
+        <h2 class="text-2xl font-semibold text-cyan-300 mb-4">Customize Your QR Code</h2>
+        <form id="qr-form" class="space-y-6">
+            <div>
+                <label for="qr-text" class="block text-sm font-medium text-gray-200">Enter URL or Text</label>
+                <input
+                        type="text"
+                        id="qr-text"
+                        class="mt-1 w-full p-3 bg-gray-800 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                        placeholder="https://example.com"
+                        required
+                        aria-required="true"
+                />
+            </div>
+
+            <div>
+                <label for="qr-size" class="block text-sm font-medium text-gray-200">QR Code Size (px)</label>
+                <input
+                        type="range"
+                        id="qr-size"
+                        min="100"
+                        max="500"
+                        value="200"
+                        class="w-full mt-1"
+                        aria-labelledby="qr-size-label"
+                />
+                <span id="qr-size-value" class="text-sm text-gray-400">200px</span>
+            </div>
+
+            <div>
+                <label for="fg-color" class="block text-sm font-medium text-gray-200">Foreground Color</label>
+                <input type="color" id="fg-color" value="#ffffff" class="mt-1" />
+            </div>
+
+            <div>
+                <label class="flex items-center">
+                    <input type="checkbox" id="use-gradient" class="mr-2">
+                    <span class="text-sm font-medium text-gray-200">Use Gradient</span>
+                </label>
+                <div id="gradient-controls" class="mt-2 hidden space-y-2">
+                    <div>
+                        <label for="gradient-color1" class="block text-sm font-medium text-gray-200">Gradient Color 1</label>
+                        <input type="color" id="gradient-color1" value="#00ffcc" class="mt-1" />
+                    </div>
+                    <div>
+                        <label for="gradient-color2" class="block text-sm font-medium text-gray-200">Gradient Color 2</label>
+                        <input type="color" id="gradient-color2" value="#ff00cc" class="mt-1" />
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label for="bg-color" class="block text-sm font-medium text-gray-200">Background Color</label>
+                <input type="color" id="bg-color" value="#000000" class="mt-1" />
+            </div>
+
+            <div>
+                <label for="border-radius" class="block text-sm font-medium text-gray-200">Border Radius (px)</label>
+                <input
+                        type="range"
+                        id="border-radius"
+                        min="0"
+                        max="50"
+                        value="10"
+                        class="w-full mt-1"
+                        aria-labelledby="border-radius-label"
+                />
+                <span id="border-radius-value" class="text-sm text-gray-400">10px</span>
+            </div>
+
+            <div>
+                <label for="padding" class="block text-sm font-medium text-gray-200">Padding (px)</label>
+                <input
+                        type="range"
+                        id="padding"
+                        min="0"
+                        max="50"
+                        value="10"
+                        class="w-full mt-1"
+                        aria-labelledby="padding-label"
+                />
+                <span id="padding-value" class="text-sm text-gray-400">10px</span>
+            </div>
+
+            <button
+                    type="button"
+                    id="download-btn"
+                    class="w-full py-3 bg-cyan-500 text-black font-semibold rounded-lg led-glow hover:bg-cyan-400 transition disabled:opacity-50"
+                    disabled
+            >
+                Download QR Code
+            </button>
+        </form>
+    </section>
+
+    <section class="flex-1 glass p-6 rounded-xl flex flex-col items-center">
+        <h2 class="text-2xl font-semibold text-cyan-300 mb-4">Preview</h2>
+        <div
+                id="qr-container"
+                class="bg-gray-900 p-4 rounded-lg"
+                style="border-radius: 10px; padding: 10px;"
+        >
+            <canvas id="qr-canvas"></canvas>
+        </div>
+    </section>
+</main>
+
+<footer class="w-full py-6 text-center text-gray-400">
+    <p>
+        Made with ❤️ by Imistrz | Source code available at
+        <a
+                href="https://github.com/Imistrz21/qrenerator"
+                class="text-cyan-400 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+        >
+            GitHub
+        </a>
+    </p>
+</footer>
+
+<script>
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    const qrText = document.getElementById('qr-text');
+    const qrSize = document.getElementById('qr-size');
+    const qrSizeValue = document.getElementById('qr-size-value');
+    const fgColor = document.getElementById('fg-color');
+    const useGradient = document.getElementById('use-gradient');
+    const gradientColor1 = document.getElementById('gradient-color1');
+    const gradientColor2 = document.getElementById('gradient-color2');
+    const bgColor = document.getElementById('bg-color');
+    const borderRadius = document.getElementById('border-radius');
+    const borderRadiusValue = document.getElementById('border-radius-value');
+    const padding = document.getElementById('padding');
+    const paddingValue = document.getElementById('padding-value');
+    const qrContainer = document.getElementById('qr-container');
+    const qrCanvas = document.getElementById('qr-canvas');
+    const downloadBtn = document.getElementById('download-btn');
+    const gradientControls = document.getElementById('gradient-controls');
+
+    let qrCode = null;
+
+    function updateQRCode() {
+        if (!qrText.value.trim()) {
+            qrCanvas.innerHTML = '';
+            downloadBtn.disabled = true;
+            return;
+        }
+
+        qrCanvas.innerHTML = '';
+        const size = parseInt(qrSize.value);
+
+        qrCode = new QRCode(qrCanvas, {
+            text: qrText.value,
+            width: size,
+            height: size,
+            colorDark: useGradient.checked
+                ? '#ffffff'
+                : fgColor.value,
+            colorLight: bgColor.value,
+        });
+
+        if (useGradient.checked) {
+            const ctx = qrCanvas.querySelector('canvas').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, gradientColor1.value);
+            gradient.addColorStop(1, gradientColor2.value);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.drawImage(qrCanvas.querySelector('canvas'), 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        downloadBtn.disabled = false;
+    }
+
+    function updateContainerStyles() {
+        qrContainer.style.borderRadius = `${borderRadius.value}px`;
+        qrContainer.style.padding = `${padding.value}px`;
+        borderRadiusValue.textContent = `${borderRadius.value}px`;
+        paddingValue.textContent = `${padding.value}px`;
+    }
+
+    function downloadQRCode() {
+        const canvas = qrCanvas.querySelector('canvas');
+        if (!canvas) return;
+
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'qrcode.png';
+        link.click();
+    }
+
+    qrText.addEventListener('input', debounce(updateQRCode, 300));
+    qrSize.addEventListener('input', () => {
+        qrSizeValue.textContent = `${qrSize.value}px`;
+        updateQRCode();
+    });
+    fgColor.addEventListener('input', updateQRCode);
+    useGradient.addEventListener('change', () => {
+        gradientControls.classList.toggle('hidden', !useGradient.checked);
+        updateQRCode();
+    });
+    gradientColor1.addEventListener('input', updateQRCode);
+    gradientColor2.addEventListener('input', updateQRCode);
+    bgColor.addEventListener('input', updateQRCode);
+    borderRadius.addEventListener('input', updateContainerStyles);
+    padding.addEventListener('input', updateContainerStyles);
+    downloadBtn.addEventListener('click', downloadQRCode);
+
+    updateContainerStyles();
+</script>
+</body>
+</html>
