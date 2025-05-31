@@ -1,0 +1,31 @@
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, #1a202c, #2d3748);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #e2e8f0;
+}
+.glass {
+  background: rgba(26, 32, 44, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.led-glow {
+  box-shadow:
+    0 0 10px theme('colors.cyan.500'),
+    0 0 20px theme('colors.magenta.500');
+}
+input[type='color'] {
+  -webkit-appearance: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+}
+input[type='color']::-webkit-color-swatch {
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}

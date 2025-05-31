@@ -1,0 +1,29 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "QRenerator is a stylish and customizable QR code generator built using HTML, CSS, and JavaScript. It allows you to create personalized QR codes with various customizations, such as color, size, gradients, and more. Whether you need a QR code for a website, contact info, or any other text, QRenerator makes it easy and fun to create the perfect QR code.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint script.js",
+    "format": "npx prettier --write ./**/*.{js,html,css,json,md}"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackghostosint/qrenerator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blackghostosint/qrenerator/issues"
+  },
+  "homepage": "https://github.com/blackghostosint/qrenerator#readme",
+  "devDependencies": {
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3"
+  }
+}
